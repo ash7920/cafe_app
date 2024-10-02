@@ -58,6 +58,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+  - assets/pictures/welcome.jpg
   - assets/images/unsplashd_9_vs_o_3166_ui.jpeg
   - assets/vectors/icon_62_x2.svg
   - assets/vectors/ios_icon_small_battery_29_x2.svg

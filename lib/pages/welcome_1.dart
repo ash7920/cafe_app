@@ -31,7 +31,7 @@ class Welcome1 extends StatelessWidget {
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage(
-                    'assets/images/unsplashd_9_vs_o_3166_ui.jpeg',
+                    'assets/pictures/welcome.jpg',
                   ),
                   fit: BoxFit.cover,
                 ),
