@@ -7,7 +7,7 @@ class Welcome1 extends StatelessWidget {
 
   // Method to add a delay before navigation
   void _navigateToToggle(BuildContext context) {
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 5), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const Toggle(), // Navigate to the Toggle page
