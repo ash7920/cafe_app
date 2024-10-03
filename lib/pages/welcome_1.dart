@@ -61,7 +61,8 @@ class Welcome1 extends StatelessWidget {
                     color: const Color(0xFF020202),
                   ),
                 ),
-                const SizedBox(height: 10), // Add some spacing between title and subtitle
+                const SizedBox(
+                    height: 10), // Add some spacing between title and subtitle
                 // Subtitle (description)
                 Text(
                   'A way to enjoy bitter and sweet of life',
