@@ -1,3 +1,5 @@
+import 'package:cafe_lp/pages/homescreen.dart';
+import 'package:cafe_lp/pages/splashscreen.dart';
 import 'package:flutter/material.dart';
 
 // Importing all the pages
@@ -21,13 +23,22 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // Define the named routes
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cafe LP',
-      home: AuthWrapper(), // Use AuthWrapper to determine whether to show Welcome1 or the main content
-      // home: Welcome1()
+      theme: ThemeData(
+        primarySwatch: Colors.brown,
+      ),
+      home: AuthWrapper(), // Use AuthWrapper to determine initial screen
+      routes: {
+        '/welcome': (context) => const Welcome1(),
+        '/toggle': (context) => const Toggle(),
+        '/splash': (context) => const SplashScreen(),
+        '/home': (context) => const HomeScreen(),
+      },
     );
   }
 }
@@ -50,8 +61,8 @@ class AuthWrapper extends StatelessWidget {
             // User is not logged in, show Welcome1
             return const Welcome1();
           } else {
-            // User is logged in, show the main content
-            return const PageSequence(); // The main content of your app
+            // User is logged in, show SplashScreen
+            return const SplashScreen();
           }
         } else {
           // While checking auth state, show a loading spinner
@@ -63,38 +74,5 @@ class AuthWrapper extends StatelessWidget {
         }
       },
     );
-  }
-}
-
-class PageSequence extends StatefulWidget {
-  const PageSequence({super.key});
-
-  @override
-  _PageSequenceState createState() => _PageSequenceState();
-}
-
-class _PageSequenceState extends State<PageSequence> {
-  final PageController _pageController = PageController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cafe LP'),
-      ),
-      body: PageView(
-        controller: _pageController,
-        scrollDirection: Axis.horizontal,
-        children: const <Widget>[
-          Toggle(), // After login, toggle between login and signup
-        ],
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 }

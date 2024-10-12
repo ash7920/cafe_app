@@ -22,6 +22,10 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
 
   final Auth _auth = Auth(); // Create an instance of the Auth class
 
+  bool _obscureLoginPassword = true;
+  bool _obscureSignupPassword = true;
+  bool _obscureSignupConfirmPassword = true;
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +43,13 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
 
   // Method to handle login
   Future<void> _login() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please fill in all fields.';
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = '';
@@ -48,10 +59,14 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
         email: _emailController.text.trim(),
         pass: _passwordController.text.trim(),
       );
-      // Handle successful login (e.g., navigate to home page)
+      // No manual navigation; AuthWrapper will handle it
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message ?? 'An error occurred during login.';
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An unexpected error occurred.';
       });
     } finally {
       setState(() {
@@ -62,28 +77,40 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
 
   // Method to handle sign up
   Future<void> _signup() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
+    if (_emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please fill in all fields.';
+      });
+      return;
+    }
 
     if (_passwordController.text != _confirmPasswordController.text) {
       setState(() {
         _errorMessage = 'Passwords do not match!';
-        _isLoading = false;
       });
       return;
     }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
 
     try {
       await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         pass: _passwordController.text.trim(),
       );
-      // Handle successful signup (e.g., navigate to home page)
+      // No manual navigation; AuthWrapper will handle it
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message ?? 'An error occurred during signup.';
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An unexpected error occurred.';
       });
     } finally {
       setState(() {
@@ -92,53 +119,94 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
     }
   }
 
+  // Reusable TextField widget with optional password toggle
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hintText,
+    bool obscureText = false,
+    VoidCallback? toggleVisibility,
+    IconData? prefixIcon,
+    IconData? suffixIcon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: const Color(0xFF57280A),
+          ),
+        ),
+        const SizedBox(height: 5),
+        TextField(
+          controller: controller,
+          obscureText: obscureText,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xFF834D1E).withOpacity(0.1),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none,
+            ),
+            hintText: hintText,
+            prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+            suffixIcon: suffixIcon != null
+                ? IconButton(
+                    icon: Icon(suffixIcon),
+                    onPressed: toggleVisibility,
+                  )
+                : null,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8E3B6),
-      body: Stack(
-        children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            child: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(
-                    'assets/images/unsplashd_9_vs_o_3166_ui.jpeg',
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            // Background image
+            Positioned.fill(
+              child: Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/images/unsplashd_9_vs_o_3166_ui.jpeg',
+                    ),
+                    fit: BoxFit.cover,
                   ),
-                  fit: BoxFit.cover,
                 ),
               ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0x4D834D1E),
+            // Overlay
+            Positioned.fill(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0x4D834D1E),
+                ),
               ),
             ),
-          ),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFF834D1E)),
-                      borderRadius: BorderRadius.circular(30),
-                      color: const Color(0xFFFCF2D9),
-                    ),
-                    child: Padding(
+            // Main content
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFF834D1E)),
+                        borderRadius: BorderRadius.circular(30),
+                        color: const Color(0xFFFCF2D9).withOpacity(0.9),
+                      ),
                       padding: const EdgeInsets.all(25),
                       child: Column(
                         children: [
@@ -153,33 +221,34 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
                             indicatorColor: const Color(0xFF834D1E),
                           ),
                           const SizedBox(height: 20),
-                          SizedBox(
-                            height: 300, // Adjust as needed
-                            child: TabBarView(
-                              controller: _tabController,
-                              children: [
-                                // Login Tab
-                                _buildLoginTab(),
-                                // Sign Up Tab
-                                _buildSignupTab(),
-                              ],
-                            ),
+                          TabBarView(
+                            controller: _tabController,
+                            children: [
+                              // Login Tab
+                              _buildLoginTab(),
+                              // Sign Up Tab
+                              _buildSignupTab(),
+                            ],
                           ),
                         ],
                       ),
                     ),
-                  ),
-                  if (_isLoading) const CircularProgressIndicator(),
-                  if (_errorMessage.isNotEmpty)
-                    Text(
-                      _errorMessage,
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                ],
+                    const SizedBox(height: 20),
+                    if (_isLoading) const CircularProgressIndicator(),
+                    if (_errorMessage.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          _errorMessage,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -194,13 +263,21 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
             controller: _emailController,
             label: 'Email',
             hintText: 'Enter your email',
+            prefixIcon: Icons.email,
           ),
           const SizedBox(height: 20),
           _buildTextField(
             controller: _passwordController,
             label: 'Password',
             hintText: 'Enter your password',
-            obscureText: true,
+            obscureText: _obscureLoginPassword,
+            prefixIcon: Icons.lock,
+            suffixIcon: _obscureLoginPassword ? Icons.visibility : Icons.visibility_off,
+            toggleVisibility: () {
+              setState(() {
+                _obscureLoginPassword = !_obscureLoginPassword;
+              });
+            },
           ),
           const SizedBox(height: 20),
           ElevatedButton(
@@ -210,11 +287,11 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
+              minimumSize: const Size(double.infinity, 50), // Full width
             ),
             child: Text(
               'Login',
-              style: GoogleFonts.getFont(
-                'Inter',
+              style: GoogleFonts.inter(
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
                 color: const Color(0xFFFCF2D9),
@@ -236,20 +313,35 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
             controller: _emailController,
             label: 'Email',
             hintText: 'Enter your email',
+            prefixIcon: Icons.email,
           ),
           const SizedBox(height: 20),
           _buildTextField(
             controller: _passwordController,
             label: 'Password',
             hintText: 'Enter your password',
-            obscureText: true,
+            obscureText: _obscureSignupPassword,
+            prefixIcon: Icons.lock,
+            suffixIcon: _obscureSignupPassword ? Icons.visibility : Icons.visibility_off,
+            toggleVisibility: () {
+              setState(() {
+                _obscureSignupPassword = !_obscureSignupPassword;
+              });
+            },
           ),
           const SizedBox(height: 20),
           _buildTextField(
             controller: _confirmPasswordController,
             label: 'Confirm Password',
             hintText: 'Confirm your password',
-            obscureText: true,
+            obscureText: _obscureSignupConfirmPassword,
+            prefixIcon: Icons.lock,
+            suffixIcon: _obscureSignupConfirmPassword ? Icons.visibility : Icons.visibility_off,
+            toggleVisibility: () {
+              setState(() {
+                _obscureSignupConfirmPassword = !_obscureSignupConfirmPassword;
+              });
+            },
           ),
           const SizedBox(height: 20),
           ElevatedButton(
@@ -259,11 +351,11 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
+              minimumSize: const Size(double.infinity, 50), // Full width
             ),
             child: Text(
               'Sign Up',
-              style: GoogleFonts.getFont(
-                'Inter',
+              style: GoogleFonts.inter(
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
                 color: const Color(0xFFFCF2D9),
@@ -272,39 +364,6 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
           ),
         ],
       ),
-    );
-  }
-
-  // Reusable TextField widget
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hintText,
-    bool obscureText = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.getFont(
-            'Inter',
-            fontWeight: FontWeight.w400,
-            fontSize: 12,
-            color: const Color(0xFF57280A),
-          ),
-        ),
-        TextField(
-          controller: controller,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: const Color(0xFF834D1E),
-            border: const OutlineInputBorder(),
-            hintText: hintText,
-          ),
-        ),
-      ],
     );
   }
 }

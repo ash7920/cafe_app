@@ -25,6 +25,17 @@ class _SignUp1State extends State<SignUp1> {
       _errorMessage = null;
     });
 
+    // Input validation
+    if (_emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'All fields are required.';
+        _isLoading = false;
+      });
+      return;
+    }
+
     if (_passwordController.text != _confirmPasswordController.text) {
       setState(() {
         _errorMessage = 'Passwords do not match';
@@ -34,25 +45,37 @@ class _SignUp1State extends State<SignUp1> {
     }
 
     try {
-      if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-        setState(() {
-          _errorMessage = 'Email and password cannot be empty';
-        });
-        return;
-      }
-
       // Firebase signup
       await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
 
       // Navigate to the home or login page after successful signup
-      Navigator.pushReplacementNamed(context, '/login'); // Replace with your desired route
-
+      Navigator.pushReplacementNamed(context, '/home'); // Replace with your desired route
+    } on FirebaseAuthException catch (e) {
+      // Specific Firebase authentication errors
+      setState(() {
+        switch (e.code) {
+          case 'email-already-in-use':
+            _errorMessage = 'This email is already in use.';
+            break;
+          case 'invalid-email':
+            _errorMessage = 'The email address is not valid.';
+            break;
+          case 'operation-not-allowed':
+            _errorMessage = 'Operation not allowed. Please contact support.';
+            break;
+          case 'weak-password':
+            _errorMessage = 'The password is too weak.';
+            break;
+          default:
+            _errorMessage = 'Sign up failed. Please try again.';
+        }
+      });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Sign up failed. Please try again.'; // Display error message
+        _errorMessage = 'An unexpected error occurred.';
       });
     } finally {
       setState(() {
@@ -63,15 +86,17 @@ class _SignUp1State extends State<SignUp1> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine screen size for responsive design
+    final Size screenSize = MediaQuery.of(context).size;
+    final double containerWidth = screenSize.width * 0.85; // 85% of screen width
+    final double containerHeight = screenSize.height * 0.7; // 70% of screen height
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8E3B6),
       body: Stack(
         children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
+          // Background image
+          Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
@@ -81,163 +106,170 @@ class _SignUp1State extends State<SignUp1> {
               ),
             ),
           ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
+          // Overlay
+          Positioned.fill(
             child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0x4D834D1E),
-              ),
+              color: const Color(0x4D834D1E),
             ),
           ),
           Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFF834D1E)),
-                      borderRadius: BorderRadius.circular(30),
-                      color: const Color(0xFFFCF2D9),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(25),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Sign Up',
-                            style: GoogleFonts.getFont(
-                              'Inter',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 24,
-                              color: const Color(0xFF834D1E),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          // Email input field
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Email',
-                                  style: GoogleFonts.getFont(
-                                    'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12,
-                                    color: const Color(0xFF57280A),
-                                  ),
-                                ),
-                                TextField(
-                                  controller: _emailController,
-                                  keyboardType: TextInputType.emailAddress,
-                                  decoration: const InputDecoration(
-                                    filled: true,
-                                    fillColor: Color(0xFF834D1E),
-                                    border: OutlineInputBorder(),
-                                    hintText: 'Enter your email',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Password input field
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Password',
-                                  style: GoogleFonts.getFont(
-                                    'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12,
-                                    color: const Color(0xFF57280A),
-                                  ),
-                                ),
-                                TextField(
-                                  controller: _passwordController,
-                                  obscureText: true,
-                                  decoration: const InputDecoration(
-                                    filled: true,
-                                    fillColor: Color(0xFF834D1E),
-                                    border: OutlineInputBorder(),
-                                    hintText: 'Enter your password',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Confirm Password input field
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Confirm Password',
-                                  style: GoogleFonts.getFont(
-                                    'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12,
-                                    color: const Color(0xFF57280A),
-                                  ),
-                                ),
-                                TextField(
-                                  controller: _confirmPasswordController,
-                                  obscureText: true,
-                                  decoration: const InputDecoration(
-                                    filled: true,
-                                    fillColor: Color(0xFF834D1E),
-                                    border: OutlineInputBorder(),
-                                    hintText: 'Confirm your password',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Show error message if present
-                          if (_errorMessage != null)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(color: Colors.red),
+            child: SizedBox(
+              width: containerWidth,
+              height: containerHeight,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xFF834D1E)),
+                  borderRadius: BorderRadius.circular(30),
+                  color: const Color(0xFFFCF2D9),
+                ),
+                padding: const EdgeInsets.all(25),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Sign Up',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 24,
+                          color: const Color(0xFF834D1E),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Email input field
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Email',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                                color: const Color(0xFF57280A),
                               ),
                             ),
-                          // Loading indicator and sign-up button
-                          _isLoading
-                              ? const CircularProgressIndicator() // Show loading spinner
-                              : ElevatedButton(
-                                  onPressed: _signUp,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF834D1E),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'Sign Up',
-                                    style: GoogleFonts.getFont(
-                                      'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15,
-                                      color: const Color(0xFFFCF2D9),
-                                    ),
-                                  ),
-                                ),
-                        ],
+                            const SizedBox(height: 5),
+                            TextField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: const InputDecoration(
+                                filled: true,
+                                fillColor: Color(0xFF834D1E),
+                                border: OutlineInputBorder(),
+                                hintText: 'Enter your email',
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      // Password input field
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Password',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                                color: const Color(0xFF57280A),
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            TextField(
+                              controller: _passwordController,
+                              obscureText: true,
+                              decoration: const InputDecoration(
+                                filled: true,
+                                fillColor: Color(0xFF834D1E),
+                                border: OutlineInputBorder(),
+                                hintText: 'Enter your password',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Confirm Password input field
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Confirm Password',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                                color: const Color(0xFF57280A),
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            TextField(
+                              controller: _confirmPasswordController,
+                              obscureText: true,
+                              decoration: const InputDecoration(
+                                filled: true,
+                                fillColor: Color(0xFF834D1E),
+                                border: OutlineInputBorder(),
+                                hintText: 'Confirm your password',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Show error message if present
+                      if (_errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      // Loading indicator and sign-up button
+                      _isLoading
+                          ? const CircularProgressIndicator() // Show loading spinner
+                          : ElevatedButton(
+                              onPressed: _signUp,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF834D1E),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                minimumSize: const Size(double.infinity, 50), // Make button full width
+                              ),
+                              child: Text(
+                                'Sign Up',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: const Color(0xFFFCF2D9),
+                                ),
+                              ),
+                            ),
+                      const SizedBox(height: 20),
+                      // Navigate back to login if needed
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Go back to the previous screen
+                        },
+                        child: Text(
+                          "Already have an account? Login!",
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                            color: const Color(0xFF834D1E),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
