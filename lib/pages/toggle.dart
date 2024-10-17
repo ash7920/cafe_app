@@ -165,93 +165,102 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8E3B6),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            // Background image
-            Positioned.fill(
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(
-                      'assets/images/unsplashd_9_vs_o_3166_ui.jpeg',
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: const Color(0xFFF8E3B6),
+    body: SafeArea(
+      child: SingleChildScrollView( // Allow the whole page to scroll
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height, // Ensure container fills the screen height
+          child: Stack(
+            children: [
+              // Background image
+              Positioned.fill(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(
+                        'assets/images/unsplashd_9_vs_o_3166_ui.jpeg',
+                      ),
+                      fit: BoxFit.cover,
                     ),
-                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-            ),
-            // Overlay
-            Positioned.fill(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0x4D834D1E),
+              // Overlay
+              Positioned.fill(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0x4D834D1E),
+                  ),
                 ),
               ),
-            ),
-            // Main content
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFF834D1E)),
-                        borderRadius: BorderRadius.circular(30),
-                        color: const Color(0xFFFCF2D9).withOpacity(0.9),
-                      ),
-                      padding: const EdgeInsets.all(25),
-                      child: Column(
-                        children: [
-                          TabBar(
-                            controller: _tabController,
-                            tabs: const [
-                              Tab(text: 'Login'),
-                              Tab(text: 'Sign Up'),
-                            ],
-                            labelColor: const Color(0xFF834D1E),
-                            unselectedLabelColor: Colors.grey,
-                            indicatorColor: const Color(0xFF834D1E),
+              // Main content
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFF834D1E)),
+                            borderRadius: BorderRadius.circular(30),
+                            color: const Color(0xFFFCF2D9).withOpacity(0.9),
                           ),
-                          const SizedBox(height: 20),
-                          TabBarView(
-                            controller: _tabController,
+                          padding: const EdgeInsets.all(25),
+                          child: Column(
                             children: [
-                              // Login Tab
-                              _buildLoginTab(),
-                              // Sign Up Tab
-                              _buildSignupTab(),
+                              TabBar(
+                                controller: _tabController,
+                                tabs: const [
+                                  Tab(text: 'Login'),
+                                  Tab(text: 'Sign Up'),
+                                ],
+                                labelColor: const Color(0xFF834D1E),
+                                unselectedLabelColor: Colors.grey,
+                                indicatorColor: const Color(0xFF834D1E),
+                              ),
+                              const SizedBox(height: 20),
+                              Expanded(
+                                child: TabBarView(
+                                  controller: _tabController,
+                                  children: [
+                                    // Login Tab
+                                    _buildLoginTab(),
+                                    // Sign Up Tab
+                                    _buildSignupTab(),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    if (_isLoading) const CircularProgressIndicator(),
-                    if (_errorMessage.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text(
-                          _errorMessage,
-                          style: const TextStyle(color: Colors.red),
                         ),
                       ),
-                  ],
+                      const SizedBox(height: 20),
+                      if (_isLoading) const CircularProgressIndicator(),
+                      if (_errorMessage.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            _errorMessage,
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   // Widget for Login Tab
   Widget _buildLoginTab() {
