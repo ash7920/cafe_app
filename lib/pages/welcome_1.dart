@@ -59,7 +59,7 @@ class Welcome1 extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     fontSize: 40,
                     letterSpacing: 10,
-                    color: const Color(0xFF020202),
+                    color: const Color.fromARGB(255, 251, 251, 251),
                   ),
                 ),
                 const SizedBox(
@@ -71,7 +71,7 @@ class Welcome1 extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     fontSize: 16,
                     letterSpacing: 1,
-                    color: const Color(0xFF000000),
+                    color: const Color.fromARGB(255, 251, 251, 251),
                   ),
                 ),
               ],
