@@ -1,5 +1,8 @@
+import 'package:cafe_lp/theme/colours.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cafe_lp/pages/menu.dart';  // Import the Menu page
+import 'package:cafe_lp/pages/cart.dart';  // Import the Cart page
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,12 +14,30 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  // List of widgets for each tab
-  final List<Widget> _tabs = [
-    const DashboardTab(),
-    const OrdersTab(),
-    const ProfileTab(),
-  ];
+  // Navigate to selected page
+  void _navigateToPage(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MenuPage()),
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Cart()),
+        );
+        break;
+      case 2:
+        // Keep Profile within the same screen
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +46,10 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(
           _getTitle(),
         ),
-        backgroundColor: Colors.brown,
+        backgroundColor: Color.fromARGB(255, 87, 40, 10),
         actions: [
           IconButton(
+            color: Colors.white,
             icon: const Icon(Icons.logout),
             onPressed: () async {
               // Handle logout
@@ -37,24 +59,20 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: _tabs[_currentIndex], // Display the current tab
+      body: _currentIndex == 2 ? ProfileTab() : Container(),  // Show Profile tab only
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        selectedItemColor: Colors.brown,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        selectedItemColor: Color.fromARGB(255, 87, 40, 10),
+        unselectedItemColor: primaryColor,
+        onTap: _navigateToPage,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+            icon: Icon(Icons.menu),
+            label: 'Menu',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'Orders',
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -68,9 +86,9 @@ class _HomeScreenState extends State<HomeScreen> {
   String _getTitle() {
     switch (_currentIndex) {
       case 0:
-        return 'Dashboard';
+        return 'Menu';
       case 1:
-        return 'Orders';
+        return 'Cart';
       case 2:
         return 'Profile';
       default:
@@ -79,37 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// Sample Dashboard Tab
-class DashboardTab extends StatelessWidget {
-  const DashboardTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Dashboard Content',
-        style: TextStyle(fontSize: 24),
-      ),
-    );
-  }
-}
-
-// Sample Orders Tab
-class OrdersTab extends StatelessWidget {
-  const OrdersTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Orders Content',
-        style: TextStyle(fontSize: 24),
-      ),
-    );
-  }
-}
-
-// Sample Profile Tab
+// Sample Profile Tab (remains in this file)
 class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
 

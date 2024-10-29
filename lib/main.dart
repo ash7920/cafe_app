@@ -1,4 +1,5 @@
 import 'package:cafe_lp/pages/homescreen.dart';
+import 'package:cafe_lp/pages/models/shop.dart';
 import 'package:cafe_lp/pages/splashscreen.dart';
 import 'package:flutter/material.dart';
 
@@ -13,11 +14,17 @@ import 'package:cafe_lp/pages/toggle.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cafe_lp/auth.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context)=> Shop(),
+      child:  const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
