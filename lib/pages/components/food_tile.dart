@@ -37,7 +37,7 @@ class FoodTile extends StatelessWidget {
             //text
             Text(
               food.name,
-              style: TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20),
             ),
       
             // price + rating
@@ -47,7 +47,7 @@ class FoodTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   //price
-                  Text('\ Rs.' + food.price,
+                  Text(' ${food.price}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold, 
                     color: Colors.grey[700]),

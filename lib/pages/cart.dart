@@ -26,6 +26,7 @@ class Cart extends StatelessWidget {
                 style: TextStyle(color: Colors.white),
                 ),
                 backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
               ),
               body: Column(
                 //customer cart
@@ -49,7 +50,7 @@ class Cart extends StatelessWidget {
                             color: secondaryColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          margin: EdgeInsets.only(left: 20, top: 20, right: 20),
+                          margin: const EdgeInsets.only(left: 20, top: 20, right: 20),
                           child: ListTile(
                             title: Text(
                               foodName,

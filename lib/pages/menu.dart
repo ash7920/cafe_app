@@ -41,14 +41,31 @@ class _MenuPageState extends State<MenuPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Icon(
-          Icons.menu,
-          color: Colors.grey[900],
+        leading:IconButton( 
+          onPressed: () {
+           Navigator.pushNamed(context, '/home');
+            },
+            icon: Icon(
+              Icons.menu,
+              color: Colors.grey[800],
+              ),
         ),
         title: Text(
-          'What are you in the mood for today?',
+          'What are you craving today?',
           style: TextStyle(color: Colors.grey[900]),
         ),
+        actions: [
+          //cart button
+          IconButton(
+          onPressed: (){
+            Navigator.pushNamed(context, '/cart');
+          }, 
+          icon: Icon(
+            Icons.shopping_cart,
+            color: Colors.grey[800],
+            ),
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -58,11 +75,11 @@ class _MenuPageState extends State<MenuPage> {
             child: TextField(
               decoration: InputDecoration(
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+                  borderSide: const BorderSide(color: Colors.white),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+                  borderSide: const BorderSide(color: Colors.white),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 hintText: "Search here...",

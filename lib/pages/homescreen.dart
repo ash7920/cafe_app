@@ -24,13 +24,13 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => MenuPage()),
+          MaterialPageRoute(builder: (context) => const MenuPage()),
         );
         break;
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Cart()),
+          MaterialPageRoute(builder: (context) => const Cart()),
         );
         break;
       case 2:
@@ -46,7 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(
           _getTitle(),
         ),
-        backgroundColor: Color.fromARGB(255, 87, 40, 10),
+        backgroundColor: const Color.fromARGB(255, 87, 40, 10),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             color: Colors.white,
@@ -59,10 +60,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: _currentIndex == 2 ? ProfileTab() : Container(),  // Show Profile tab only
+      body: _currentIndex == 2 ? const ProfileTab() : Container(),  // Show Profile tab only
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        selectedItemColor: Color.fromARGB(255, 87, 40, 10),
+        selectedItemColor: const Color.fromARGB(255, 87, 40, 10),
         unselectedItemColor: primaryColor,
         onTap: _navigateToPage,
         items: const [
@@ -86,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _getTitle() {
     switch (_currentIndex) {
       case 0:
-        return 'Menu';
+        return 'Home';
       case 1:
         return 'Cart';
       case 2:

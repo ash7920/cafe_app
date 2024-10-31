@@ -20,7 +20,7 @@ class MyButton extends StatelessWidget {
           color: secondaryColor,
           borderRadius: BorderRadius.circular(40),
         ),
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

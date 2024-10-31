@@ -34,30 +34,23 @@ class _FooddetailsState extends State<Fooddetails> {
 
   // add to cart method
   void addToCart() {
-    // only add to cart if there is something in cart
     if (quantityCount > 0) {
-      //get access to shop
       final shop = context.read<Shop>();
-
-      //add to cart
       shop.addToCart(widget.food, quantityCount);
 
-      //let user know successfully added to cart
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: primaryColor,
-          content: const Text("Item was successfully added to cart",
-          style: TextStyle(color: Colors.white),
-          textAlign: TextAlign.center,
+          content: const Text(
+            "Item was successfully added to cart",
+            style: TextStyle(color: Colors.white),
+            textAlign: TextAlign.center,
           ),
           actions: [
             IconButton(
               onPressed: () {
-                // pop once to remove dialog box
                 Navigator.pop(context);
-
-                //pop again to go to previous screen
                 Navigator.pop(context);
               },
               icon: const Icon(Icons.done),
@@ -78,143 +71,117 @@ class _FooddetailsState extends State<Fooddetails> {
       ),
       body: Column(
         children: [
-          //listview of food details at top
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: Expanded(
-                child: ListView(
-              children: [
-                //image
-                Image.asset(
-                  widget.food.imagepath,
-                  height: 200,
-                ),
-                const SizedBox(height: 25),
-
-                //rating
-                Row(
-                  children: [
-                    //star icon
-                    Icon(
-                      Icons.star,
-                      color: Colors.yellow[700],
-                    ),
-
-                    const SizedBox(width: 10),
-
-                    //rating no
-                    Text(
-                      widget.food.rating,
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontWeight: FontWeight.bold,
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              child: ListView(
+                children: [
+                  Image.asset(
+                    widget.food.imagepath,
+                    height: 250,
+                    width: 400,
+                  ),
+                  const SizedBox(height: 25),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.star,
+                        color: Colors.yellow[700],
                       ),
-                    )
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                //food name
-                Text(
-                  widget.food.name,
-                  style: TextStyle(fontSize: 28),
-                ),
-
-                const SizedBox(height: 25),
-
-                //description
-                Text(
-                  "Welcome!",
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                      const SizedBox(width: 10),
+                      Text(
+                        widget.food.rating,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    ],
                   ),
-                ),
-
-                const SizedBox(height: 10),
-
-                Text(
-                  "We’re dedicated to sustainability by using eco-friendly packaging, locally-sourced ingredients, and energy-efficient practices. To support a greener future, online customers can choose our minimal-packaging option and even opt to donate a portion of their order to environmental initiatives. Together, let’s make every sip count for the planet! 🌍☕",
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                    height: 2,
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.food.name,
+                    style: const TextStyle(fontSize: 28),
                   ),
-                ),
-              ],
-            )),
+                  const SizedBox(height: 25),
+                  Text(
+                    "Description:",
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.food.description,
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontSize: 14,
+                      height: 2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-
-          // price + quantity + add to cart button
-
           Container(
             color: primaryColor,
             padding: const EdgeInsets.all(25),
             child: Column(
               children: [
-                // price + quantity
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    //price
                     Text(
-                      "\ Rs." + widget.food.price,
-                      style: TextStyle(
+                      // ignore: unnecessary_string_interpolations
+                      '${widget.food.price}',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
                     ),
-
-                    //quantity
-
-                    //minus button
                     Container(
                       decoration: BoxDecoration(
                         color: secondaryColor,
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
-                          icon: Icon(
-                            Icons.remove,
-                            color: Colors.white,
-                          ),
-                          onPressed: decrementQuantity),
+                        icon: Icon(
+                          Icons.remove,
+                          color: Colors.grey[800],
+                        ),
+                        onPressed: decrementQuantity,
+                      ),
                     ),
-                    //quantity count
                     SizedBox(
                       width: 40,
                       child: Text(
                         quantityCount.toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
                       ),
                     ),
-
-                    //plus button
                     Container(
                       decoration: BoxDecoration(
                         color: secondaryColor,
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
-                          icon: Icon(
-                            Icons.remove,
-                            color: Colors.white,
-                          ),
-                          onPressed: incrementQuantity),
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.grey[800],
+                        ),
+                        onPressed: incrementQuantity,
+                      ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 25),
-
-                //add to cart button
                 MyButton(text: "Add to Cart", onTap: addToCart),
               ],
             ),

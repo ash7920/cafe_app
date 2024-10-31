@@ -1,3 +1,4 @@
+import 'package:cafe_lp/pages/cart.dart';
 import 'package:cafe_lp/pages/homescreen.dart';
 import 'package:cafe_lp/pages/models/shop.dart';
 import 'package:cafe_lp/pages/splashscreen.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         '/toggle': (context) => const Toggle(),
         '/splash': (context) => const SplashScreen(),
         '/home': (context) => const HomeScreen(),
+        '/cart': (context) => const Cart(),
       },
     );
   }
