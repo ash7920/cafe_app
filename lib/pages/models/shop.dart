@@ -35,7 +35,7 @@ class Shop extends ChangeNotifier {
         name: "Avocado Toast",
         price: "Rs. 250",
         imagepath: "assets/images/avocadotoast.jpg",
-        rating: "4.2",
+        rating: "4.5",
         description: "A vibrant twist on a cafe classic, our Avocado Toast is served on freshly toasted artisan bread, lavishly topped with creamy, ripe avocado. Sprinkled with a hint of sea salt and chili flakes, it’s vegan, with gluten-free bread available for an even healthier start to your day. "
         ),
 

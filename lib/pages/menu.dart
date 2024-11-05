@@ -46,7 +46,7 @@ class _MenuPageState extends State<MenuPage> {
            Navigator.pushNamed(context, '/home');
             },
             icon: Icon(
-              Icons.menu,
+              Icons.home,
               color: Colors.grey[800],
               ),
         ),

@@ -53,7 +53,10 @@ class _FooddetailsState extends State<Fooddetails> {
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
-              icon: const Icon(Icons.done),
+              icon: const Icon(
+                Icons.done,
+                color: Colors.white,
+                ),
             )
           ],
         ),
