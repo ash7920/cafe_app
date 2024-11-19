@@ -43,7 +43,7 @@ class _MenuPageState extends State<MenuPage> {
         elevation: 0,
         leading:IconButton( 
           onPressed: () {
-           Navigator.pushNamed(context, '/home');
+           Navigator.pushReplacementNamed(context, '/home');
             },
             icon: Icon(
               Icons.home,

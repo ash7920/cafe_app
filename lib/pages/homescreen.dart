@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     switch (index) {
       case 0:
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const MenuPage()),
         );
@@ -278,7 +278,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       color: Colors.white,
                     ),
@@ -286,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 10),
                   Text(
                     price,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                     ),
                   ),
@@ -294,10 +294,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          Icon(
+          const Icon(
             Icons.favorite,
             size: 28,
-            color: const Color.fromARGB(255, 147, 12, 3),
+            color: Color.fromARGB(255, 147, 12, 3),
           ),
         ],
       ),
@@ -309,9 +309,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return 'Home';
       case 1:
-        return 'Cart';
+        return 'Home';
       case 2:
-        return 'Profile';
+        return 'Home';
       default:
         return 'Cafe LP';
     }
