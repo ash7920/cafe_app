@@ -13,9 +13,9 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   //menu page
+  String selectedCategory = 'ALL';
 
   //navigate to food item details page
-
   void navigateToFoodDetails(int index) {
     // get shop and its menu
     final shop = context.read<Shop>();
@@ -33,36 +33,38 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-     // get shop and its menu
-    final shop = context.read<Shop>();
+    // get shop and its menu
+    final shop = context.watch<Shop>();
     final foodMenu = shop.foodMenu;
+
     return Scaffold(
       backgroundColor: secondaryColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
         elevation: 0,
-        leading:IconButton( 
+        leading: IconButton(
           onPressed: () {
-           Navigator.pushReplacementNamed(context, '/home');
-            },
-            icon: Icon(
-              Icons.home,
-              color: Colors.grey[800],
-              ),
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+          icon: const Icon(
+            Icons.home,
+            color: Colors.white,
+          ),
         ),
-        title: Text(
+        title: const Text(
           'What are you craving today?',
-          style: TextStyle(color: Colors.grey[900]),
+          style: TextStyle(color: Colors.white),
         ),
         actions: [
           //cart button
           IconButton(
-          onPressed: (){
-            Navigator.pushNamed(context, '/cart');
-          }, 
-          icon: Icon(
-            Icons.shopping_cart,
-            color: Colors.grey[800],
+            onPressed: () {
+              Navigator.pushNamed(context, '/cart');
+            },
+            icon: const Icon(
+              Icons.shopping_cart,
+              color: Colors.white,
             ),
           )
         ],
@@ -103,6 +105,23 @@ class _MenuPageState extends State<MenuPage> {
 
           const SizedBox(height: 10),
 
+          // Category Chips
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildCategoryChip('ALL'),
+                _buildCategoryChip('HOT BEVERAGES'),
+                _buildCategoryChip('ICED BEVERAGES'),
+                _buildCategoryChip('ADD-INS'),
+                _buildCategoryChip('SYRUPS'),
+                _buildCategoryChip('FOOD'),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.vertical,
@@ -118,5 +137,35 @@ class _MenuPageState extends State<MenuPage> {
         ],
       ),
     );
+  }
+
+  Widget _buildCategoryChip(String category) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: ChoiceChip(
+        label: Text(category),
+        selected: selectedCategory == category,
+        onSelected: (bool selected) {
+          setState(() {
+            selectedCategory = category;
+          });
+          _filterProducts(category);
+        },
+        selectedColor: primaryColor,
+        backgroundColor: Colors.grey[300],
+        labelStyle: TextStyle(
+          color: selectedCategory == category ? Colors.white : Colors.black,
+        ),
+      ),
+    );
+  }
+
+  void _filterProducts(String category) {
+    final shop = Provider.of<Shop>(context, listen: false);
+    if (category == 'ALL') {
+      shop.fetchFoodMenu();
+    } else {
+      shop.fetchProductsByCategory(category);
+    }
   }
 }

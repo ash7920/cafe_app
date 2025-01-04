@@ -1,8 +1,12 @@
+import 'package:cafe_lp/pages/models/food.dart';
+import 'package:cafe_lp/pages/models/shop.dart';
 import 'package:cafe_lp/theme/colours.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cafe_lp/pages/menu.dart';  // Import the Menu page
-import 'package:cafe_lp/pages/cart.dart';  // Import the Cart page
+import 'package:cafe_lp/pages/menu.dart';
+import 'package:cafe_lp/pages/cart.dart';
+import 'package:provider/provider.dart';
+import 'dart:math';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,13 +38,27 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         break;
       case 2:
-        // Keep Profile within the same screen
+      // Profile stays on same screen, no need to navigate
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final shop = context.watch<Shop>();
+    final foodMenu = shop.foodMenu;
+
+    // Generate random indices for bestsellers, recommendations, and favorites
+    final random = Random();
+     final bestsellerIndex = foodMenu.isNotEmpty ? random.nextInt(foodMenu.length) : null;
+      final favoriteIndex = foodMenu.isNotEmpty ? random.nextInt(foodMenu.length) : null;
+
+
+     // Get the items based on the random indices
+    final Food? bestseller = bestsellerIndex != null ? foodMenu[bestsellerIndex] : null;
+      final Food? favorite = favoriteIndex != null ? foodMenu[favoriteIndex] : null;
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -66,54 +84,54 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Bestseller
-            Container(
-              decoration: BoxDecoration(
-                color: primaryColor,
-                borderRadius: BorderRadius.circular(20),
+            if (bestseller != null)
+              Container(
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded( // Use Expanded to constrain text width
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Our Bestsellers:',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            bestseller.name ?? "No Name",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                           const SizedBox(height: 10),
+                          // Removed price as it's not in the API response
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10), // Space between text and image
+                    // Image
+                    if (bestseller.image != null)
+                        Image.network(
+                          bestseller.image!,
+                          height: 100,
+                       ) else const SizedBox.shrink(),
+                  ],
+                ),
               ),
-              margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-              padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Our Bestsellers:',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        'Espresso',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      SizedBox(height: 10),
-
-                      Text('Rs.150',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.white,
-                      ),
-                      ),
-                    ],
-                  ),
-                  // Image
-                  Image.asset(
-                    'assets/images/espresso.jpg',
-                    height: 100,
-                  ),
-                ],
-              ),
-            ),
 
             // Recommendations Section
             Padding(
@@ -129,31 +147,32 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 10),
 
-            // Horizontal Scrollable Recommendations
-            SingleChildScrollView(
+             // Horizontal Scrollable Recommendations
+            SizedBox(  // Use SizedBox to constrain horizontal scroll view height
+            height: 170,
+            child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Row(
-                children: [
-                  _buildRecommendationItem(
-                    imageUrl: 'assets/images/avocadotoast.jpg',
-                    title: 'Avocado Toast',
-                    price: 'Rs.250',
-                  ),
-                  const SizedBox(width: 10),
-                  _buildRecommendationItem(
-                    imageUrl: 'assets/images/chocolatecroissant.jpg',
-                    title: 'Chocolate Croissant',
-                    price: 'Rs.160',
-                  ),
-                  const SizedBox(width: 10),
-                  _buildRecommendationItem(
-                    imageUrl: 'assets/images/acaibowl.jpg',
-                    title: 'Acai Bowl',
-                    price: 'Rs.200',
-                  ),
-                ],
-              ),
+               itemCount:  min(3, foodMenu.length),
+              separatorBuilder: (context, index) => const SizedBox(width: 10),
+              itemBuilder: (context, index){
+                   final random = Random();
+                  int randomIndex;
+                   Set<int> usedIndices = {};
+
+                  do {
+                    randomIndex = random.nextInt(foodMenu.length);
+                  } while(usedIndices.contains(randomIndex));
+
+                  usedIndices.add(randomIndex);
+
+                  final food = foodMenu[randomIndex];
+                  return  _buildRecommendationItem(
+                      imageUrl: food.image,
+                      title: food.name ?? "No Name",
+                    );
+              } ,
+             ),
             ),
 
             const SizedBox(height: 25),
@@ -173,11 +192,13 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 10),
 
             // Favorite Item
-            _buildFavoriteItem(
-              imageUrl: 'assets/images/acaibowl.jpg',
-              title: 'Acai Bowl',
-              price: 'Rs.200',
-            ),
+            if (favorite != null)
+              _buildFavoriteItem(
+                imageUrl: favorite.image,
+                title: favorite.name ?? "No Name",
+                ),
+              const SizedBox(height: 25), // Add some space at the bottom
+
           ],
         ),
       ),
@@ -206,22 +227,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRecommendationItem({
-    required String imageUrl,
+    String? imageUrl,
     required String title,
-    required String price,
   }) {
-    return Container(
+     return Container(
       width: 150,
       height: 150,
       decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(imageUrl),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.35), // Darken the image
-            BlendMode.darken,
-          ),
-        ),
+        image: imageUrl != null
+            ? DecorationImage(
+                image: NetworkImage(imageUrl),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.35), // Darken the image
+                  BlendMode.darken,
+                ),
+              )
+            : null,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Padding(
@@ -238,71 +260,63 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(
-              price,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.white70,
-              ),
-            ),
+            // Removed price as it's not in the API response
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFavoriteItem({
-    required String imageUrl,
-    required String title,
-    required String price,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: primaryColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
+ Widget _buildFavoriteItem({
+  String? imageUrl,
+  required String title,
+}) {
+  return Container(
+    decoration: BoxDecoration(
+      color: primaryColor,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+    padding: const EdgeInsets.all(20),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start, // Align items to the top
+      children: [
+        if (imageUrl != null)
+          Image.network(
+            imageUrl,
+            height: 100,
+            width: 100, // Set fixed width for the image
+            fit: BoxFit.cover,
+          ),
+        const SizedBox(width: 10), // Space between image and text
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                imageUrl,
-                height: 100,
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
+                maxLines: 2, // Limit text to 2 lines
+                overflow: TextOverflow.ellipsis, // Add ellipsis if text overflows
               ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    price,
-                    style: const TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(height: 10),
+              // Removed price as it's not in the API response
             ],
           ),
-          const Icon(
-            Icons.favorite,
-            size: 28,
-            color: Color.fromARGB(255, 147, 12, 3),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+        const Icon(
+          Icons.favorite,
+          size: 28,
+          color: Color.fromARGB(255, 147, 12, 3),
+        ),
+      ],
+    ),
+  );
+}
+
 
   String _getTitle() {
     switch (_currentIndex) {
@@ -332,7 +346,7 @@ class ProfileTab extends StatelessWidget {
             'Profile Content',
             style: TextStyle(fontSize: 24),
           ),
-          SizedBox(height: 20),  // Space between texts
+          SizedBox(height: 20), // Space between texts
           Text(
             'Your code or message for the Profile tab goes here.',
             style: TextStyle(fontSize: 16, color: Colors.grey),

@@ -9,8 +9,7 @@ class FoodTile extends StatelessWidget {
     super.key,
     required this.food,
     required this.onTap,
-  }
-);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,46 +22,26 @@ class FoodTile extends StatelessWidget {
         ),
         margin: const EdgeInsets.all(25),
         padding: const EdgeInsets.all(25),
-      
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // image
-            Image.asset(
-              food.imagepath,
-              height: 300,
-              width: 300,
-              ),
-      
+            food.image != null
+                ? Image.network(
+                    food.image!,
+                    height: 300,
+                    width: 300,
+                    fit: BoxFit.cover,
+                  )
+                : const SizedBox.shrink(),
             //text
             Text(
-              food.name,
+              food.name ?? "No Name",
               style: const TextStyle(fontSize: 20),
             ),
-      
+
             // price + rating
-            SizedBox(
-              width: 160,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  //price
-                  Text(' ${food.price}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold, 
-                    color: Colors.grey[700]),
-                  ),
-      
-                  //rating
-                  Icon(Icons.star,
-                  color: Colors.yellow[700],
-                  ),
-                  Text(food.rating,
-                  style: TextStyle(color: Colors.grey[700]),
-                  ), 
-                ],
-              ),
-            )
+            // Removed price and rating as they are not in the API response
           ],
         ),
       ),

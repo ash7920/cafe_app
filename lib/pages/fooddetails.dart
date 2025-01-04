@@ -56,7 +56,7 @@ class _FooddetailsState extends State<Fooddetails> {
               icon: const Icon(
                 Icons.done,
                 color: Colors.white,
-                ),
+              ),
             )
           ],
         ),
@@ -79,31 +79,20 @@ class _FooddetailsState extends State<Fooddetails> {
               padding: const EdgeInsets.symmetric(horizontal: 25.0),
               child: ListView(
                 children: [
-                  Image.asset(
-                    widget.food.imagepath,
-                    height: 250,
-                    width: 400,
-                  ),
+                  // Display the image from the API
+                  widget.food.image != null
+                      ? Image.network(
+                          widget.food.image!,
+                          height: 250,
+                          width: 400,
+                          fit: BoxFit.cover,
+                        )
+                      : const SizedBox.shrink(), // Handle case where image is null
                   const SizedBox(height: 25),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.star,
-                        color: Colors.yellow[700],
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        widget.food.rating,
-                        style: TextStyle(
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    ],
-                  ),
+                  // Removed the star rating as it's not in the API response
                   const SizedBox(height: 10),
                   Text(
-                    widget.food.name,
+                    widget.food.name ?? "No Name",
                     style: const TextStyle(fontSize: 28),
                   ),
                   const SizedBox(height: 25),
@@ -117,13 +106,85 @@ class _FooddetailsState extends State<Fooddetails> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    widget.food.description,
+                    widget.food.description ?? "No Description",
                     style: TextStyle(
                       color: Colors.grey[700],
                       fontSize: 14,
                       height: 2,
                     ),
                   ),
+                  const SizedBox(height: 25),
+                  if (widget.food.recipeIngredient != null &&
+                      widget.food.recipeIngredient!.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Ingredients:",
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ...widget.food.recipeIngredient!.map((ingredient) =>
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5.0),
+                              child: Text(
+                                "- $ingredient",
+                                style: TextStyle(
+                                  color: Colors.grey[700],
+                                  fontSize: 14,
+                                  height: 1.5,
+                                ),
+                              ),
+                            )),
+                      ],
+                    ),
+                  const SizedBox(height: 25),
+                  if (widget.food.recipeInstructions != null &&
+                      widget.food.recipeInstructions!.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Instructions:",
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ...widget.food.recipeInstructions!.map((instruction) =>
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    instruction.name ?? "",
+                                    style: TextStyle(
+                                      color: Colors.grey[800],
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    instruction.text ?? "",
+                                    style: TextStyle(
+                                      color: Colors.grey[700],
+                                      fontSize: 14,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -137,8 +198,8 @@ class _FooddetailsState extends State<Fooddetails> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      // ignore: unnecessary_string_interpolations
-                      '${widget.food.price}',
+                      // Display the name as price is not available
+                      widget.food.category ?? "No Name",
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
