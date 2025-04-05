@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cafe_lp/auth.dart'; // Import the Auth class
-import 'package:firebase_auth/firebase_auth.dart'; // For Firebase-specific errors
+import 'package:cafe_lp/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Toggle extends StatefulWidget {
   const Toggle({super.key});
@@ -16,11 +17,12 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController(); // Name controller
 
-  bool _isLoading = false; // To show a loading state
-  String _errorMessage = ''; // To display error messages
+  bool _isLoading = false;
+  String _errorMessage = '';
 
-  final Auth _auth = Auth(); // Create an instance of the Auth class
+  final Auth _auth = Auth();
 
   bool _obscureLoginPassword = true;
   bool _obscureSignupPassword = true;
@@ -38,10 +40,10 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
-  // Method to handle login
   Future<void> _login() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
@@ -59,7 +61,6 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
         email: _emailController.text.trim(),
         pass: _passwordController.text.trim(),
       );
-      // No manual navigation; AuthWrapper will handle it
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message ?? 'An error occurred during login.';
@@ -75,11 +76,11 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
     }
   }
 
-  // Method to handle sign up
   Future<void> _signup() async {
     if (_emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
-        _confirmPasswordController.text.isEmpty) {
+        _confirmPasswordController.text.isEmpty ||
+        _nameController.text.isEmpty) {
       setState(() {
         _errorMessage = 'Please fill in all fields.';
       });
@@ -99,11 +100,17 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
     });
 
     try {
-      await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         pass: _passwordController.text.trim(),
       );
-      // No manual navigation; AuthWrapper will handle it
+
+      // Store name in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({'name': _nameController.text.trim(), 'email': _emailController.text.trim()});
+
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message ?? 'An error occurred during signup.';
@@ -119,7 +126,6 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
     }
   }
 
-  // Reusable TextField widget with optional password toggle
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -165,104 +171,98 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
     );
   }
 
- @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: const Color(0xFFF8E3B6),
-    body: SafeArea(
-      child: SingleChildScrollView( // Allow the whole page to scroll
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height, // Ensure container fills the screen height
-          child: Stack(
-            children: [
-              // Background image
-              Positioned.fill(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        'assets/images/unsplashd_9_vs_o_3166_ui.jpeg',
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8E3B6),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(
+                          'assets/images/unsplashd_9_vs_o_3166_ui.jpeg',
+                        ),
+                        fit: BoxFit.cover,
                       ),
-                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-              ),
-              // Overlay
-              Positioned.fill(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0x4D834D1E),
+                Positioned.fill(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0x4D834D1E),
+                    ),
                   ),
                 ),
-              ),
-              // Main content
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFF834D1E)),
-                            borderRadius: BorderRadius.circular(30),
-                            color: const Color(0xFFFCF2D9).withOpacity(0.9),
-                          ),
-                          padding: const EdgeInsets.all(25),
-                          child: Column(
-                            children: [
-                              TabBar(
-                                controller: _tabController,
-                                tabs: const [
-                                  Tab(text: 'Login'),
-                                  Tab(text: 'Sign Up'),
-                                ],
-                                labelColor: const Color(0xFF834D1E),
-                                unselectedLabelColor: Colors.grey,
-                                indicatorColor: const Color(0xFF834D1E),
-                              ),
-                              const SizedBox(height: 20),
-                              Expanded(
-                                child: TabBarView(
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: const Color(0xFF834D1E)),
+                              borderRadius: BorderRadius.circular(30),
+                              color: const Color(0xFFFCF2D9).withOpacity(0.9),
+                            ),
+                            padding: const EdgeInsets.all(25),
+                            child: Column(
+                              children: [
+                                TabBar(
                                   controller: _tabController,
-                                  children: [
-                                    // Login Tab
-                                    _buildLoginTab(),
-                                    // Sign Up Tab
-                                    _buildSignupTab(),
+                                  tabs: const [
+                                    Tab(text: 'Login'),
+                                    Tab(text: 'Sign Up'),
                                   ],
+                                  labelColor: const Color(0xFF834D1E),
+                                  unselectedLabelColor: Colors.grey,
+                                  indicatorColor: const Color(0xFF834D1E),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 20),
+                                Expanded(
+                                  child: TabBarView(
+                                    controller: _tabController,
+                                    children: [
+                                      _buildLoginTab(),
+                                      SingleChildScrollView(child: _buildSignupTab()), // Make Sign Up scrollable
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      if (_isLoading) const CircularProgressIndicator(),
-                      if (_errorMessage.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            _errorMessage,
-                            style: const TextStyle(color: Colors.red),
+                        const SizedBox(height: 20),
+                        if (_isLoading) const CircularProgressIndicator(),
+                        if (_errorMessage.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Text(
+                              _errorMessage,
+                              style: const TextStyle(color: Colors.red),
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-  // Widget for Login Tab
   Widget _buildLoginTab() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -290,13 +290,13 @@ Widget build(BuildContext context) {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: _login, // Call login method
+            onPressed: _login,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF834D1E),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              minimumSize: const Size(double.infinity, 50), // Full width
+              minimumSize: const Size(double.infinity, 50),
             ),
             child: Text(
               'Login',
@@ -312,12 +312,18 @@ Widget build(BuildContext context) {
     );
   }
 
-  // Widget for Sign Up Tab
   Widget _buildSignupTab() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
+          _buildTextField(
+            controller: _nameController,
+            label: 'Name',
+            hintText: 'Enter your name',
+            prefixIcon: Icons.person,
+          ),
+          const SizedBox(height: 20),
           _buildTextField(
             controller: _emailController,
             label: 'Email',
@@ -354,13 +360,13 @@ Widget build(BuildContext context) {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: _signup, // Call signup method
+            onPressed: _signup,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF834D1E),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              minimumSize: const Size(double.infinity, 50), // Full width
+              minimumSize: const Size(double.infinity, 50),
             ),
             child: Text(
               'Sign Up',
