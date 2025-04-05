@@ -82,9 +82,12 @@ class Cart extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(25.0),
                 child: MyButton(
-                  text: "Pay Now",
+                  text: "Place Order",
                   onTap: () {
-                    // Handle payment logic
+                    // Add the current cart items to order history and clear cart
+                    shop.placeOrder();
+                    // Navigate to the order history page
+                    Navigator.pushNamed(context, '/orderHistory');
                   },
                 ),
               ),

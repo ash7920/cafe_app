@@ -12,12 +12,9 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  //menu page
   String selectedCategory = 'ALL';
 
-  //navigate to food item details page
   void navigateToFoodDetails(int index) {
-    // get shop and its menu
     final shop = context.read<Shop>();
     final foodMenu = shop.foodMenu;
 
@@ -33,7 +30,6 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    // get shop and its menu
     final shop = context.watch<Shop>();
     final foodMenu = shop.foodMenu;
 
@@ -57,7 +53,6 @@ class _MenuPageState extends State<MenuPage> {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          //cart button
           IconButton(
             onPressed: () {
               Navigator.pushNamed(context, '/cart');
@@ -71,7 +66,10 @@ class _MenuPageState extends State<MenuPage> {
       ),
       body: Column(
         children: [
-          //search bar
+          // Increased space between AppBar and Search Bar
+          const SizedBox(height: 40), 
+
+          // Search bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: TextField(
@@ -90,7 +88,7 @@ class _MenuPageState extends State<MenuPage> {
           ),
           const SizedBox(height: 25),
 
-          // menu
+          // Menu header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: Text(
@@ -102,7 +100,6 @@ class _MenuPageState extends State<MenuPage> {
               ),
             ),
           ),
-
           const SizedBox(height: 10),
 
           // Category Chips
@@ -119,9 +116,9 @@ class _MenuPageState extends State<MenuPage> {
               ],
             ),
           ),
-
           const SizedBox(height: 10),
 
+          // Food List
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.vertical,
@@ -132,7 +129,6 @@ class _MenuPageState extends State<MenuPage> {
               ),
             ),
           ),
-
           const SizedBox(height: 25),
         ],
       ),

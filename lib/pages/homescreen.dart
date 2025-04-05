@@ -1,7 +1,7 @@
 import 'package:cafe_lp/pages/models/food.dart';
 import 'package:cafe_lp/pages/models/shop.dart';
+import 'package:cafe_lp/pages/profile.dart';
 import 'package:cafe_lp/theme/colours.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cafe_lp/pages/menu.dart';
 import 'package:cafe_lp/pages/cart.dart';
@@ -38,7 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         break;
       case 2:
-      // Profile stays on same screen, no need to navigate
+     Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Profile()),
+        );
         break;
     }
   }
@@ -66,17 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            color: Colors.white,
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              // Handle logout
-              await FirebaseAuth.instance.signOut();
-              Navigator.pushReplacementNamed(context, '/welcome');
-            },
-          ),
-        ],
       ),
       backgroundColor: secondaryColor,
       body: SingleChildScrollView(
@@ -332,28 +324,3 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// Sample Profile Tab (remains in this file)
-class ProfileTab extends StatelessWidget {
-  const ProfileTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Profile Content',
-            style: TextStyle(fontSize: 24),
-          ),
-          SizedBox(height: 20), // Space between texts
-          Text(
-            'Your code or message for the Profile tab goes here.',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}

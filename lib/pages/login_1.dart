@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cafe_lp/pages/sign_up_1.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Login1 extends StatefulWidget {
   const Login1({super.key});
 
- @override
+  @override
   _Login1State createState() => _Login1State();
 }
 
 class _Login1State extends State<Login1> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   bool _isLoading = false; // Track loading state
   String? _errorMessage; // Track error message
 
@@ -27,17 +31,28 @@ class _Login1State extends State<Login1> {
 
     try {
       // Input validation
-      if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      if (_emailController.text.isEmpty ||
+          _passwordController.text.isEmpty ||
+          _nameController.text.isEmpty) {
         setState(() {
-          _errorMessage = 'Email and password cannot be empty';
+          _errorMessage = 'Name, Email, and Password cannot be empty';
         });
         return;
       }
 
       // Firebase login
-      await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
+      );
+
+      // Add/update user details in Firestore
+      await _firestore.collection('users').doc(userCredential.user!.uid).set(
+        {
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+        },
+        SetOptions(merge: true), // Merge fields if the document already exists
       );
 
       // Navigate to home or dashboard page on successful login
@@ -78,7 +93,7 @@ class _Login1State extends State<Login1> {
     // Determine screen size for responsive design
     final Size screenSize = MediaQuery.of(context).size;
     final double containerWidth = screenSize.width * 0.85; // 85% of screen width
-    final double containerHeight = screenSize.height * 0.6; // 60% of screen height
+    final double containerHeight = screenSize.height * 0.7; // Adjust height for extra input
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8E3B6),
@@ -107,6 +122,33 @@ class _Login1State extends State<Login1> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // Name input field
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Name',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: const Color(0xFF57280A),
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        TextField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Color(0xFF834D1E),
+                            border: OutlineInputBorder(),
+                            hintText: 'Enter your name',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   // Email input field
                   Container(
                     margin: const EdgeInsets.only(bottom: 20),

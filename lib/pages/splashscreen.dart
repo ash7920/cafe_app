@@ -23,32 +23,35 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       // Optional: Add a background image or color
       backgroundColor: Colors.brown,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Logo or app name
-            Image.asset(
-              'assets/pictures/welcome.jpg', 
-              height: 100,
-              width: 100,
+      body: Stack( // Use Stack to put the image behind other widgets
+        children: [
+          Positioned.fill( // Make the image fill the entire screen
+            child: Image.asset(
+              'assets/pictures/welcome.jpg',
+              fit: BoxFit.cover, // Cover the entire screen, cropping if necessary
             ),
-            const SizedBox(height: 20),
-            // Loading indicator
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+          const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Loading indicator
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Loading...',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            const Text(
-              'Loading...',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:cafe_lp/pages/cart.dart';
 import 'package:cafe_lp/pages/homescreen.dart';
 import 'package:cafe_lp/pages/models/shop.dart';
+import 'package:cafe_lp/pages/orderhistory.dart';
 import 'package:cafe_lp/pages/splashscreen.dart';
 import 'package:flutter/material.dart';
 
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         '/splash': (context) => const SplashScreen(),
         '/home': (context) => const HomeScreen(),
         '/cart': (context) => const Cart(),
+        '/orderHistory': (context) => const OrderHistory(),
       },
     );
   }

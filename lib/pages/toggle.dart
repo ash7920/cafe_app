@@ -1,8 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cafe_lp/auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'splashscreen.dart'; // Import your SplashScreen
 
 class Toggle extends StatefulWidget {
   const Toggle({super.key});
@@ -17,12 +17,10 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController(); // Name controller
+  final TextEditingController _nameController = TextEditingController();
 
   bool _isLoading = false;
   String _errorMessage = '';
-
-  final Auth _auth = Auth();
 
   bool _obscureLoginPassword = true;
   bool _obscureSignupPassword = true;
@@ -56,10 +54,17 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
       _isLoading = true;
       _errorMessage = '';
     });
+
     try {
-      await _auth.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
-        pass: _passwordController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      // Navigate to SplashScreen after successful login
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SplashScreen()),
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -100,17 +105,35 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
     });
 
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
-        pass: _passwordController.text.trim(),
+        password: _passwordController.text.trim(),
       );
 
-      // Store name in Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({'name': _nameController.text.trim(), 'email': _emailController.text.trim()});
+      User? user = userCredential.user;
 
+      if (user != null) {
+        await user.updateDisplayName(_nameController.text.trim());
+        await user.reload();
+
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'name': _nameController.text.trim(),
+          'email': user.email,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // Navigate to SplashScreen after successful signup
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const SplashScreen()),
+        );
+      } else {
+        setState(() {
+          _errorMessage = 'User creation failed. Please try again.';
+        });
+        return;
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message ?? 'An error occurred during signup.';
@@ -233,7 +256,7 @@ class _ToggleState extends State<Toggle> with SingleTickerProviderStateMixin {
                                     controller: _tabController,
                                     children: [
                                       _buildLoginTab(),
-                                      SingleChildScrollView(child: _buildSignupTab()), // Make Sign Up scrollable
+                                      SingleChildScrollView(child: _buildSignupTab()),
                                     ],
                                   ),
                                 ),

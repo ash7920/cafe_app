@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Add Firestore package
 
 class SignUp1 extends StatefulWidget {
   const SignUp1({super.key});
@@ -10,11 +11,13 @@ class SignUp1 extends StatefulWidget {
 }
 
 class _SignUp1State extends State<SignUp1> {
+  final TextEditingController _nameController = TextEditingController(); // Name controller
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Firestore instance
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -26,7 +29,8 @@ class _SignUp1State extends State<SignUp1> {
     });
 
     // Input validation
-    if (_emailController.text.isEmpty ||
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
       setState(() {
@@ -46,10 +50,16 @@ class _SignUp1State extends State<SignUp1> {
 
     try {
       // Firebase signup
-      await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      // Store additional user data in Firestore
+      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+      });
 
       // Navigate to the home or login page after successful signup
       Navigator.pushReplacementNamed(context, '/home'); // Replace with your desired route
@@ -137,6 +147,33 @@ class _SignUp1State extends State<SignUp1> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      // Name input field
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Name',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                                color: const Color(0xFF57280A),
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            TextField(
+                              controller: _nameController,
+                              decoration: const InputDecoration(
+                                filled: true,
+                                fillColor: Color(0xFF834D1E),
+                                border: OutlineInputBorder(),
+                                hintText: 'Enter your name',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       // Email input field
                       Container(
                         margin: const EdgeInsets.only(bottom: 20),
