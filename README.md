@@ -58,12 +58,6 @@ assets/                Images and SVG graphics
 ## Note on live data
 The menu data originally came from a hosted REST API. That API has since been discontinued, so the menu no longer loads live data and the app will show an empty menu. The API calls are all in `lib/pages/models/shop.dart`, so the data source can be swapped for a local JSON file or another API without changing the UI.
 
-## Screenshots
-[Add screenshots here, for example:]
-
-| Menu | Item details | Cart |
-|------|--------------|------|
-| ![Menu](screenshots/menu.png) | ![Details](screenshots/details.png) | ![Cart](screenshots/cart.png) |
 
 ## What I learned
 - Designing screens in Figma first, then turning them into Flutter widgets.
